@@ -1,0 +1,524 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* === Core Palette === */
+  --color-primary: #1e40af;
+  --color-primary-light: #3b82f6;
+  --color-primary-dark: #1e3a8a;
+  --color-sky: #0ea5e9;
+  --color-sky-light: #e0f2fe;
+
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+
+  --color-danger: #dc2626;
+  --color-danger-light: #fef2f2;
+  --color-success: #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fff7ed;
+  --color-amber: #d97706;
+
+  --color-surface: var(--card);
+  --color-canvas: var(--background);
+  --color-warm: #faf8f5;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --sidebar-width: 240px;
+  --topbar-height: 64px;
+}
+
+.dark {
+  --background: #0b0f19;
+  --foreground: #f8fafc;
+  --border: #1f293d;
+  --border-light: #111827;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --card: #111827;
+  --card-foreground: #f8fafc;
+  --accent: #1f293d;
+  --accent-foreground: #f8fafc;
+}
+
+/* === Reset === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* === Focus === */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* === Base transitions === */
+button, a { transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1); }
+input, select, textarea { transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease; }
+
+/* ============================================================
+   ANIMATIONS — orchestrated, purposeful (Sedikit dilamain / elegant stagger)
+   ============================================================ */
+
+/* Staggered slide-up fade (page children) */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Gentle fade only (overlays, chat bubbles) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Slide in from left (sidebar links) */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Scale in (badges, modals) */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Shimmer (loading states) */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Ambient gradient drift (hero bg) */
+@keyframes gradientDrift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* Pulse dot (live indicator) */
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.3); opacity: 0.6; }
+}
+
+/* Count shimmer for stats */
+@keyframes statReveal {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Floating ambient (hero decorations) */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(1deg); }
+  66%       { transform: translateY(-4px) rotate(-1deg); }
+}
+
+/* ============================================================
+   ANIMATION UTILITY CLASSES
+   ============================================================ */
+
+/* Stagger helpers — apply to parent, children get delays */
+.anim-page > * {
+  animation: slideUp 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.anim-page > *:nth-child(1) { animation-delay: 0ms; }
+.anim-page > *:nth-child(2) { animation-delay: 80ms; }
+.anim-page > *:nth-child(3) { animation-delay: 160ms; }
+.anim-page > *:nth-child(4) { animation-delay: 240ms; }
+.anim-page > *:nth-child(5) { animation-delay: 320ms; }
+.anim-page > *:nth-child(6) { animation-delay: 400ms; }
+
+/* Single-element entrance variants */
+.anim-slide-up  { animation: slideUp  650ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-fade-in   { animation: fadeIn   450ms ease-out both; }
+.anim-scale-in  { animation: scaleIn  500ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Delay modifiers */
+.anim-delay-1 { animation-delay: 80ms; }
+.anim-delay-2 { animation-delay: 160ms; }
+.anim-delay-3 { animation-delay: 240ms; }
+.anim-delay-4 { animation-delay: 320ms; }
+.anim-delay-5 { animation-delay: 400ms; }
+
+/* Sidebar link stagger */
+.sidebar-nav a, .sidebar-nav button {
+  animation: slideInLeft 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.sidebar-nav a:nth-child(1), .sidebar-nav button:nth-child(1) { animation-delay: 50ms; }
+.sidebar-nav a:nth-child(2), .sidebar-nav button:nth-child(2) { animation-delay: 100ms; }
+.sidebar-nav a:nth-child(3), .sidebar-nav button:nth-child(3) { animation-delay: 150ms; }
+.sidebar-nav a:nth-child(4), .sidebar-nav button:nth-child(4) { animation-delay: 200ms; }
+.sidebar-nav a:nth-child(5), .sidebar-nav button:nth-child(5) { animation-delay: 250ms; }
+.sidebar-nav a:nth-child(6), .sidebar-nav button:nth-child(6) { animation-delay: 300ms; }
+
+.animate-fade-in { animation: fadeIn 450ms ease-out forwards; }
+.animate-slide-in { animation: slideUp 500ms cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-pulse-ring { animation: pulseDot 2s ease-in-out infinite; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-gradient { animation: gradientDrift 8s ease infinite; background-size: 200% 200%; }
+
+/* ============================================================
+   INTERACTIVE SURFACES — varied hover states
+   ============================================================ */
+
+/* Card lift — more dramatic than before */
+.card-hover {
+  transition: box-shadow 250ms cubic-bezier(0.4,0,0.2,1),
+              transform 250ms cubic-bezier(0.4,0,0.2,1),
+              border-color 200ms ease,
+              background-color 200ms ease;
+  will-change: transform;
+}
+.card-hover:hover {
+  box-shadow: 0 8px 24px rgba(30, 64, 175, 0.10), 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+  border-color: #bfdbfe;
+}
+.dark .card-hover:hover {
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15), 0 2px 8px rgba(0,0,0,0.3);
+  border-color: #0ea5e9;
+}
+
+/* Interactive row (table rows, list items) */
+.row-hover {
+  transition: background 150ms ease;
+  cursor: pointer;
+}
+.row-hover:hover { background: #f0f7ff; }
+.dark .row-hover:hover { background: #1e293b; }
+
+/* Button press feedback */
+button:active:not(:disabled) { transform: scale(0.97); }
+
+/* Icon button glow */
+.icon-btn {
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.icon-btn:hover {
+  background: #eff6ff;
+  color: #1e40af;
+  transform: scale(1.08);
+}
+.dark .icon-btn:hover {
+  background: #1e293b;
+  color: #0ea5e9;
+}
+
+/* Nav link active glow */
+.nav-active {
+  position: relative;
+}
+.nav-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: #1e40af;
+  border-radius: 0 3px 3px 0;
+}
+.dark .nav-active::before {
+  background: #0ea5e9;
+}
+
+/* Tag/badge pop on hover */
+.badge-pop {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.badge-pop:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(30,64,175,0.15); }
+.dark .badge-pop:hover { box-shadow: 0 2px 8px rgba(14,165,233,0.25); }
+
+/* ============================================================
+   BACKGROUND TREATMENTS — breaking monotony
+   ============================================================ */
+
+/* Subtle dot grid for main content areas */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-color: var(--background);
+}
+
+/* Blue-tinted canvas for analytics */
+.bg-canvas-blue {
+  background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 40%, #faf8f5 100%);
+}
+.dark .bg-canvas-blue {
+  background: linear-gradient(135deg, #0b0f19 0%, #0d1322 40%, #0b0f19 100%);
+}
+
+/* Warm canvas for study plan (deadline pressure) */
+.bg-canvas-warm {
+  background: linear-gradient(135deg, #f8fafc 0%, #fff7ed 60%, #faf8f5 100%);
+}
+.dark .bg-canvas-warm {
+  background: linear-gradient(135deg, #0b0f19 0%, #17120c 60%, #111827 100%);
+}
+
+/* Hero gradient — the signature element */
+.hero-gradient {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 40%, #0ea5e9 100%);
+  background-size: 200% 200%;
+  animation: gradientDrift 8s ease infinite;
+}
+
+/* Sidebar — distinct from content area */
+.sidebar-surface {
+  background: linear-gradient(180deg, var(--card) 0%, var(--background) 100%);
+  border-right: 1px solid var(--color-border);
+}
+
+/* Card with coloured left strip */
+.card-accent-left {
+  border-left: 4px solid var(--color-primary);
+  transition: border-color 200ms ease;
+}
+.card-accent-left:hover { border-color: var(--color-sky); }
+
+/* Urgent card */
+.card-urgent {
+  background: linear-gradient(135deg, #fff7ed 0%, var(--card) 60%);
+  border-color: #fed7aa;
+}
+.dark .card-urgent {
+  background: linear-gradient(135deg, #2a1508 0%, var(--card) 60%);
+  border-color: #9a3412;
+}
+
+/* Success card */
+.card-success {
+  background: linear-gradient(135deg, #f0fdf4 0%, var(--card) 60%);
+  border-color: #bbf7d0;
+}
+.dark .card-success {
+  background: linear-gradient(135deg, #0a2712 0%, var(--card) 60%);
+  border-color: #166534;
+}
+
+/* Priority card gradient glow */
+.priority-high {
+  background: linear-gradient(135deg, #eff6ff 0%, var(--card) 60%);
+}
+.dark .priority-high {
+  background: linear-gradient(135deg, #1e3a8a 0%, var(--card) 60%);
+}
+
+/* Shimmer loader */
+.shimmer {
+  background: linear-gradient(90deg, var(--color-muted) 25%, var(--color-border) 50%, var(--color-muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Floating glow orb (decorative) */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ============================================================
+   SMOOTH SCROLL-TRIGGERED REVEAL SYSTEM
+   ============================================================ */
+
+/* Elements enter smoothly when they appear in viewport */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal="left"] {
+  transform: translateX(-24px);
+}
+[data-reveal="right"] {
+  transform: translateX(24px);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger children via CSS delay */
+[data-reveal-stagger] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal-stagger].is-visible > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0ms; }
+[data-reveal-stagger].is-visible > *:nth-child(2) { opacity:1; transform:none; transition-delay: 70ms; }
+[data-reveal-stagger].is-visible > *:nth-child(3) { opacity:1; transform:none; transition-delay: 140ms; }
+[data-reveal-stagger].is-visible > *:nth-child(4) { opacity:1; transform:none; transition-delay: 210ms; }
+[data-reveal-stagger].is-visible > *:nth-child(5) { opacity:1; transform:none; transition-delay: 280ms; }
+[data-reveal-stagger].is-visible > *:nth-child(6) { opacity:1; transform:none; transition-delay: 350ms; }
+
+/* ============================================================
+   ENHANCED HOVER MICRO-INTERACTIONS
+   ============================================================ */
+
+/* Smooth link hover underline from left */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: width 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.link-underline:hover::after { width: 100%; }
+
+/* Press-depth button effect — more tactile than scale alone */
+.btn-press {
+  transition: transform 120ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+.btn-press:hover  { transform: translateY(-1px); }
+.btn-press:active { transform: translateY(1px) scale(0.98); box-shadow: none !important; }
+
+/* Card hover with gentle lift + glow */
+.card-lift {
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 200ms ease;
+  will-change: transform;
+}
+.card-lift:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 12px 32px rgba(30, 64, 175, 0.12), 0 4px 12px rgba(0,0,0,0.05);
+}
+.dark .card-lift:hover {
+  box-shadow: 0 12px 32px rgba(14, 165, 233, 0.18), 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Sidebar link smooth transition */
+.sidebar-link {
+  transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sidebar-link:hover { transform: translateX(2px); }
+.sidebar-link:active { transform: translateX(1px) scale(0.99); }
+
+/* Smooth focus ring */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+  transition: outline-offset 120ms ease;
+}
+
+/* Smooth page transitions — already on .anim-page, just enhance */
+.anim-page {
+  animation: pageEnter 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input focus smooth expand */
+input:focus, textarea:focus {
+  transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+}
+
+/* Toggle switch animation (used in Workflow notification toggles) */
+.toggle-thumb {
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Scroll bar — subtle, matching the design */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+  transition: background 200ms ease;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+
+/* Reduced motion — always respect user preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
