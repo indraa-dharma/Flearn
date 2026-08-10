@@ -12,18 +12,23 @@ Document text:
 ${input.text.slice(0, 24000)}`;
 }
 
-export function buildStudyPlanPrompt(input: { documents: string; calendar: string; now: string; preferences?: unknown }) {
+export function buildStudyPlanPrompt(input: { documents: string; calendar: string; now: string; preferences?: any }) {
   const hasDocs = input.documents.trim().length > 0;
   const docsSection = hasDocs
     ? `Documents:
 ${input.documents.slice(0, 30000)}`
     : `Documents: None uploaded yet. Create a general weekly study plan based on typical university courses and the student's calendar.`;
 
+  const userRequest = input.preferences?.prompt 
+    ? `\nUSER SPECIFIC REQUEST / PROMPT:\n"${input.preferences.prompt}"\n\nCRITICAL INSTRUCTION: You MUST fulfill the user's specific request above! If they ask for a specific date, time, topic, or focus, you MUST prioritize it over a general weekly plan.`
+    : "";
+
   return `${system}
 
 Task: Create a realistic calendar-aware study workflow${hasDocs ? " based on the uploaded documents" : ""}.
 You are a smart scheduler. The current date and time is: ${input.now}.
 Look at the user's existing calendar events. Find free time slots today or in the next few days to schedule the workflow_steps. Output exact ISO start_time and end_time for each block without overlapping existing events.
+${userRequest}
 
 Schema: {"title":"string","summary":"string","priority_reasoning":"string","workflow_steps":[{"title":"string","description":"string","course":"string","topic":"string","type":"study|review|practice|break","duration_minutes":number,"reasoning":"string"}],"recommended_time_blocks":[{"title":"string","start_time":"ISO string","end_time":"ISO string","reason":"string"}],"next_action":"string","calendar_events_to_create":[{"title":"string","description":"string","start_time":"ISO string","end_time":"ISO string"}]}
 
@@ -33,5 +38,5 @@ Calendar events:
 ${input.calendar}
 
 Preferences:
-${JSON.stringify(input.preferences ?? { language: "id-en", sessionMinutes: 60 })}`;
+${JSON.stringify({ language: input.preferences?.language || "id-en", sessionMinutes: input.preferences?.sessionMinutes || 60 })}`;
 }
