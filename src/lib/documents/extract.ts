@@ -1,5 +1,3 @@
-import pdf from "pdf-parse";
-
 export async function extractTextFromFile(file: File): Promise<{ text: string; status: "done" | "failed"; message?: string }> {
   const name = file.name.toLowerCase();
   const type = file.type;
@@ -12,6 +10,8 @@ export async function extractTextFromFile(file: File): Promise<{ text: string; s
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const pdfModule = await import("pdf-parse");
+      const pdf = pdfModule.default ?? pdfModule;
       const data = await pdf(buffer);
       
       if (!data.text || data.text.trim().length === 0) {
