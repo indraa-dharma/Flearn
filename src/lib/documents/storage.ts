@@ -8,7 +8,9 @@ type StoredFile = {
 };
 
 function getStorageDriver() {
-  return (process.env.UPLOAD_STORAGE_DRIVER || (process.env.NODE_ENV === "production" ? "supabase" : "local")).toLowerCase();
+  return (process.env.UPLOAD_STORAGE_DRIVER || (process.env.NODE_ENV === "production" ? "supabase" : "local"))
+    .trim()
+    .toLowerCase();
 }
 
 function getSupabaseConfig() {
