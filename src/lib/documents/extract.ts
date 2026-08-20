@@ -11,8 +11,11 @@ export async function extractTextFromFile(file: File): Promise<{ text: string; s
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      // pdf.js needs these canvas polyfills in serverless Node runtimes (Vercel).
+      // Import the worker entrypoint first so DOMMatrix, Path2D, and ImageData exist.
+      const { CanvasFactory } = await import("pdf-parse/worker");
       const { PDFParse } = await import("pdf-parse");
-      parser = new PDFParse({ data: buffer });
+      parser = new PDFParse({ data: buffer, CanvasFactory });
       const data = await parser.getText();
       
       if (!data.text || data.text.trim().length === 0) {

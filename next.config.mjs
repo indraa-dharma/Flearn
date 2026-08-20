@@ -39,6 +39,9 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep the native canvas bindings and pdf worker available in Vercel Functions.
+  serverExternalPackages: ["pdf-parse", "@napi-rs/canvas"],
+
   // Project root for Turbopack (silences "multiple lockfiles" warning)
   turbopack: {
     root: dirname(fileURLToPath(import.meta.url)),
