@@ -20,16 +20,28 @@ export async function generateDocumentSummary(userId: string, documentId: string
 }
 
 export async function generateStudyPlan(userId: string, documentIds?: string[] | null, preferences?: unknown) {
-  // If documentIds is explicitly an empty array, do NOT auto-fetch old documents.
-  // Only fetch documents when IDs are explicitly provided.
-  const shouldFetchDocs = Array.isArray(documentIds) ? documentIds.length > 0 : false;
+  const requestedDocumentIds = Array.isArray(documentIds)
+    ? [...new Set(documentIds.filter((id): id is string => typeof id === "string" && id.length > 0))]
+    : [];
+  const shouldFetchDocs = requestedDocumentIds.length > 0;
   const docs = shouldFetchDocs
     ? await prisma.document.findMany({
-        where: { userId, id: { in: documentIds! } },
+        where: { userId, id: { in: requestedDocumentIds } },
         orderBy: { createdAt: "desc" },
-        take: documentIds!.length,
+        take: requestedDocumentIds.length,
       })
     : [];
+
+  if (shouldFetchDocs && docs.length !== requestedDocumentIds.length) {
+    throw new ApiError("One or more selected documents could not be found", 400);
+  }
+
+  const unreadableDocument = docs.find(
+    (doc) => doc.status !== "ready" || doc.extractionStatus !== "done" || (doc.extractedText?.trim().length || 0) < 50,
+  );
+  if (unreadableDocument) {
+    throw new ApiError(`Document "${unreadableDocument.originalName || unreadableDocument.title}" is not ready for AI analysis`, 422);
+  }
 
   const start = new Date();
   const end = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);

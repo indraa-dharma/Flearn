@@ -7,12 +7,13 @@ export async function extractTextFromFile(file: File): Promise<{ text: string; s
   }
   
   if (name.endsWith(".pdf")) {
+    let parser: import("pdf-parse").PDFParse | undefined;
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const pdfModule = await import("pdf-parse");
-      const pdf = pdfModule.default ?? pdfModule;
-      const data = await pdf(buffer);
+      const { PDFParse } = await import("pdf-parse");
+      parser = new PDFParse({ data: buffer });
+      const data = await parser.getText();
       
       if (!data.text || data.text.trim().length === 0) {
          return { text: `PDF uploaded: ${file.name}. Could not extract any readable text from this PDF. It might be scanned images.`, status: "failed", message: "Empty PDF or scanned image without OCR" };
@@ -22,6 +23,8 @@ export async function extractTextFromFile(file: File): Promise<{ text: string; s
     } catch (e: any) {
       console.error("PDF Extraction Error:", e);
       return { text: `PDF uploaded: ${file.name}. Failed to extract text: ${e.message}`, status: "failed", message: `PDF extraction failed: ${e.message}` };
+    } finally {
+      await parser?.destroy().catch(() => undefined);
     }
   }
   

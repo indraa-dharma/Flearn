@@ -50,6 +50,16 @@ export function FileUploadModal({ isOpen, onClose, onUploadSuccess }: FileUpload
       return;
     }
 
+    const lowerName = selectedFile.name.toLowerCase();
+    if (!lowerName.endsWith(".pdf") && !lowerName.endsWith(".txt") && !lowerName.endsWith(".md")) {
+      setError("Format belum didukung. Gunakan PDF, TXT, atau Markdown.");
+      return;
+    }
+    if (selectedFile.size > 4 * 1024 * 1024) {
+      setError("Ukuran file maksimal 4 MB.");
+      return;
+    }
+
     setIsUploading(true);
     setError("");
     setProgress(15);
@@ -70,8 +80,8 @@ export function FileUploadModal({ isOpen, onClose, onUploadSuccess }: FileUpload
 
       clearInterval(interval);
 
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         if (data.success) {
           setProgress(100);
           setSuccess(true);
@@ -88,7 +98,7 @@ export function FileUploadModal({ isOpen, onClose, onUploadSuccess }: FileUpload
           setError(data.error || "Failed to upload file");
         }
       } else {
-        setError("Network error during file upload");
+        setError(data.error || "Upload gagal. Silakan coba lagi.");
       }
     } catch (err) {
       setError("An unexpected error occurred while uploading.");
@@ -141,6 +151,7 @@ export function FileUploadModal({ isOpen, onClose, onUploadSuccess }: FileUpload
               <input
                 type="file"
                 ref={fileInputRef}
+                accept=".pdf,.txt,.md"
                 onChange={handleFileChange}
                 className="hidden"
                 id="laptop-direct-upload"
@@ -172,7 +183,7 @@ export function FileUploadModal({ isOpen, onClose, onUploadSuccess }: FileUpload
                 ) : (
                   <>
                     <p className="text-sm font-bold text-foreground">Click to browse laptop files or drag & drop</p>
-                    <p className="text-xs text-muted-foreground mt-1">Supports PDF, DOCX, PPTX, MP4 (Up to 50MB)</p>
+                    <p className="text-xs text-muted-foreground mt-1">Mendukung PDF, TXT, dan Markdown (maks. 4 MB)</p>
                   </>
                 )}
               </div>

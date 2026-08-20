@@ -77,24 +77,6 @@ export default function WorkflowDetailModal({
   const contentRef = useRef<HTMLDivElement>(null);
   const cfg = typeConfig[type] || typeConfig.study;
 
-  // Fetch explanation when modal opens (use cache if available)
-  useEffect(() => {
-    if (!isOpen) return;
-    setError(null);
-
-    // If cached, use it immediately
-    if (cachedExplanation) {
-      setExplanation(cachedExplanation);
-      setIsLoading(false);
-      return;
-    }
-
-    setExplanation(null);
-    setIsLoading(true);
-    fetchExplanation();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, title, cachedExplanation]);
-
   const fetchExplanation = async () => {
     setIsLoading(true);
     setError(null);
@@ -114,6 +96,24 @@ export default function WorkflowDetailModal({
       setIsLoading(false);
     }
   };
+
+  // Fetch explanation when modal opens (use cache if available)
+  useEffect(() => {
+    if (!isOpen) return;
+    setError(null);
+
+    // If cached, use it immediately
+    if (cachedExplanation) {
+      setExplanation(cachedExplanation);
+      setIsLoading(false);
+      return;
+    }
+
+    setExplanation(null);
+    setIsLoading(true);
+    fetchExplanation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, title, cachedExplanation]);
 
   // Scroll to top when content loads
   useEffect(() => {

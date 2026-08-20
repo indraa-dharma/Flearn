@@ -7,7 +7,8 @@ export interface StoredSource {
   name: string;
   type: "pdf" | "doc" | "video" | "other";
   size: string;
-  status: "processing" | "ready";
+  status: "processing" | "ready" | "failed";
+  error?: string;
 }
 
 export interface StoredMessage {

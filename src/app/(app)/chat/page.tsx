@@ -24,6 +24,7 @@ import {
   BookOpen,
   Loader2,
   CheckCircle,
+  AlertCircle,
   Zap,
   Clock,
   Target,
@@ -57,7 +58,8 @@ interface Source {
   name: string;
   type: "pdf" | "doc" | "video" | "other";
   size: string;
-  status: "processing" | "ready";
+  status: "processing" | "ready" | "failed";
+  error?: string;
 }
 
 interface Message {
@@ -272,6 +274,14 @@ export default function WorkspacePage() {
       const tempSource: Source = { id: tempId, name: f.name, type: getFileType(f.name), size: `${(f.size / 1024).toFixed(0)} KB`, status: "processing" };
       setSources((prev) => [...prev, tempSource]);
       try {
+        const lowerName = f.name.toLowerCase();
+        if (!lowerName.endsWith(".pdf") && !lowerName.endsWith(".txt") && !lowerName.endsWith(".md")) {
+          throw new Error("Format belum didukung. Gunakan PDF, TXT, atau Markdown.");
+        }
+        if (f.size > 4 * 1024 * 1024) {
+          throw new Error("Ukuran file maksimal 4 MB.");
+        }
+
         const form = new FormData();
         form.append("file", f);
         const res = await fetch("/api/documents", { method: "POST", body: form });
@@ -281,7 +291,9 @@ export default function WorkspacePage() {
         addNotification(`"${f.name}" berhasil diupload`, "Dokumen siap dianalisis oleh AI.", "upload");
       } catch (error) {
         console.error(error);
-        setSources((prev) => prev.map((s) => s.id === tempId ? { ...s, status: "ready" } : s));
+        const message = error instanceof Error ? error.message : "Upload gagal";
+        setSources((prev) => prev.map((s) => s.id === tempId ? { ...s, status: "failed", error: message } : s));
+        addNotification(`Upload "${f.name}" gagal`, message, "info");
       }
     }
   };
@@ -412,6 +424,12 @@ export default function WorkspacePage() {
       if (isWorkflowRequest) {
         // Explicitly pass only the source IDs from THIS session
         const sourceIds = getValidSourceIds();
+        if (sources.some((source) => source.status === "processing")) {
+          throw new Error("Tunggu sampai semua dokumen selesai diproses sebelum membuat jadwal");
+        }
+        if (sources.length > 0 && sourceIds.length === 0) {
+          throw new Error("Belum ada dokumen yang berhasil diproses. Upload ulang sumber yang berstatus gagal");
+        }
         const res = await fetch("/api/study-plans/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -574,7 +592,7 @@ export default function WorkspacePage() {
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.doc,.docx,.mp4,.mov,.txt"
+          accept=".pdf,.txt,.md"
           className="hidden"
           onChange={(e) => addFiles(e.target.files)}
         />
@@ -602,6 +620,10 @@ export default function WorkspacePage() {
                     {src.status === "processing" ? (
                       <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400">
                         <Loader2 className="h-2.5 w-2.5 animate-spin" /> Memproses…
+                      </span>
+                    ) : src.status === "failed" ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-red-600 dark:text-red-400" title={src.error}>
+                        <AlertCircle className="h-2.5 w-2.5" /> Gagal
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400">
